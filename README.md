@@ -8,9 +8,7 @@
 
 Steering vectors offer a training-free way to control reasoning behaviors in LLMs, but existing methods like SEAL detect behavioral boundaries through keyword matching—treating every match as a genuine signal. We find that **93.3% of keyword-detected boundaries are behaviorally unstable**: the model fails to reproduce the detected behavior when re-run from the same prefix. Our method, **stability filtering**, retains only the small fraction of boundaries that consistently reproduce the target behavior, amplifying the steering signal. Combined with content-subspace projection, this achieves **0.784** accuracy on MATH-500 (+5.0 over SEAL), and the vectors transfer across models without re-extraction.
 
-<p align="center">
-  <img src="figures/concept_fig.html" width="100%" alt="Concept Figure"/>
-</p>
+📊 See `figures/concept_fig.html` for an interactive overview figure (open in browser).
 
 ## Main Results
 
@@ -107,7 +105,7 @@ python src/eval/eval_MATH_vllm_steering.py \
 @article{zhuang2025mine,
   title={Reliable Control-Point Selection for Steering Reasoning in Large Language Models},
   author={Zhuang, Haomin and Yoo, Hojun and Luo, Xiaonan and Guo, Kehan and Zhang, Xiangliang},
-  year={2025}
+  year={2026}
 }
 ```
 
