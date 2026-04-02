@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-bg: #ecfdf5; --green-border: #34d399; --green-text: #065f46; --green-accent: #10b981;
+    --amber-bg: #fffbeb; --amber-border: #fbbf24; --amber-text: #92400e; --amber-accent: #f59e0b;
+    --blue-bg: #eff6ff; --blue-border: #60a5fa; --blue-text: #1e40af; --blue-accent: #3b82f6;
+    --red-bg: #fef2f2; --red-border: #f87171; --red-text: #991b1b; --red-accent: #ef4444; --red-bar: #f87171;
+    --stable-green: #22c55e;
+    --slate: #334155; --muted: #94a3b8; --card-bg: rgba(255,255,255,0.9);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #fff; padding: 10px; color: var(--slate); }
+
+  .wrapper { max-width: 1100px; margin: 0 auto; }
+
+  .row {
+    display: flex; gap: 8px; align-items: stretch;
+  }
+
+  .panel {
+    padding: 10px 12px; display: flex; flex-direction: column; align-items: center;
+    position: relative; overflow: hidden; border-radius: 14px;
+  }
+  .panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3.5px; }
+
+  .panel-ext { background: var(--green-bg); border: 2px solid var(--green-border); flex: 0.85; }
+  .panel-ext::before { background: var(--green-accent); }
+  .panel-int { background: var(--amber-bg); border: 2px solid var(--amber-border); flex: 0.85; }
+  .panel-int::before { background: var(--amber-accent); }
+  .panel-seal { background: var(--blue-bg); border: 2px solid var(--blue-border); flex: 1.25; }
+  .panel-seal::before { background: var(--blue-accent); }
+  .panel-obs { background: var(--red-bg); border: 2px solid var(--red-border); flex: 1; }
+  .panel-obs::before { background: var(--red-accent); }
+
+  .title {
+    font-size: 16px; font-weight: 800; letter-spacing: -0.02em;
+    margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+    width: 100%; justify-content: center;
+  }
+  .panel-ext .title { color: var(--green-text); }
+  .panel-int .title { color: var(--amber-text); }
+  .panel-seal .title { color: var(--blue-text); }
+  .panel-obs .title { color: var(--red-text); }
+
+  .icon { font-size: 20px; }
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; width: 100%; justify-content: center; }
+  .emoji { font-size: 28px; line-height: 1; letter-spacing: 2px; }
+
+  .card {
+    background: var(--card-bg); border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 8px; padding: 4px 8px; text-align: center; width: 100%;
+  }
+  .card .mono {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: var(--slate);
+  }
+
+  .prompt-ex {
+    font-size: 12px; color: var(--green-text); font-weight: 600;
+    background: #fff; border: 1px solid var(--green-border); border-radius: 6px;
+    padding: 2px 7px; text-align: center;
+  }
+
+  /* Arrows */
+  .arrow-circle {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #f1f5f9; border: 1.5px solid #e2e8f0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--muted); flex-shrink: 0; align-self: center;
+  }
+  .arrow-circle-alert {
+    background: #fef2f2; border-color: var(--red-border); color: var(--red-accent);
+  }
+
+  /* Intrinsic: abstract CoT lines */
+  .cot-abstract {
+    background: var(--card-bg); border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px; padding: 6px 8px; width: 100%;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .cot-line { height: 3px; border-radius: 2px; background: #d4d4d4; }
+  .cot-line-short { width: 65%; }
+  .cot-line-med { width: 82%; }
+  .cot-line-long { width: 93%; }
+  .cot-line-full { width: 100%; }
+  .cot-line-highlight {
+    background: var(--amber-accent); height: 5px; border-radius: 2px;
+    position: relative;
+  }
+  .cot-line-highlight::after {
+    content: '⚡'; position: absolute; right: -14px; top: -4px; font-size: 12px;
+  }
+  .cot-line-highlight-short { width: 55%; }
+  .cot-line-highlight-long { width: 78%; }
+  .spontaneous-label {
+    font-size: 13px; font-weight: 700; color: var(--amber-accent); text-align: center; margin-top: 2px;
+  }
+
+  /* SEAL CoT with \n\n and formula */
+  .cot-seal {
+    background: var(--card-bg); border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px; padding: 6px 8px; width: 100%;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    line-height: 1.5; color: var(--slate);
+  }
+  .newline-row {
+    display: flex; align-items: center; gap: 6px; margin: 3px 0;
+  }
+  .newline-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px; font-weight: 800; color: var(--red-accent);
+    flex-shrink: 0;
+  }
+  .newline-line {
+    flex: 1; height: 1px; background: #ddd;
+  }
+  .cot-seal .kw { background: #fef08a; padding: 0 3px; border-radius: 2px; font-weight: 600; color: #854d0e; }
+  .detect-row {
+    display: flex; align-items: center; gap: 4px; margin-top: 4px;
+  }
+  .detect-label {
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--blue-text);
+  }
+  .detect-formula {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+    color: var(--slate); background: #e0ecff; padding: 2px 6px; border-radius: 4px;
+    margin-left: auto;
+  }
+
+  /* Histogram */
+  .hist-wrap {
+    width: 100%; padding: 22px 3px 2px;
+    background: var(--card-bg); border-radius: 8px; border: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+  }
+  .hist-bars {
+    display: flex; align-items: flex-end; gap: 2px; justify-content: center;
+    height: 52px; border-bottom: 1px solid #e2e8f0; padding-bottom: 1px;
+  }
+  .hist-col { display: flex; flex-direction: column; align-items: center; position: relative; }
+  .hist-bar { width: 13px; border-radius: 2px 2px 0 0; min-height: 1px; }
+  .bar-red { background: var(--red-bar); opacity: 0.8; }
+  .bar-green { background: var(--stable-green); opacity: 0.85; }
+  .hist-tick { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #cbd5e1; }
+  .hist-xlabel { font-size: 10px; color: var(--muted); text-align: center; margin-top: 1px; }
+
+  .bar-label {
+    position: absolute; top: -20px;
+    font-size: 13px; font-weight: 800; white-space: nowrap;
+  }
+  .bar-label-red { color: var(--red-accent); }
+  .bar-label-green { color: var(--stable-green); }
+
+  /* Bracket labels */
+  .bracket-labels {
+    display: flex; justify-content: space-between; margin-top: 3px; padding: 0 2px;
+  }
+  .bracket {
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .bracket-line {
+    height: 1px; width: 100%;
+  }
+  .bracket-text { font-size: 10px; font-weight: 800; }
+  .bracket-red { color: var(--red-text); }
+  .bracket-red .bracket-line { background: var(--red-accent); }
+  .bracket-green { color: #166534; }
+  .bracket-green .bracket-line { background: var(--stable-green); }
+
+  .finding-text {
+    font-size: 10px; font-weight: 700; color: var(--red-text); text-align: center;
+  }
+
+  /* Bottom narrative arc */
+  .narrative {
+    display: flex; justify-content: space-between; margin-top: 6px; padding: 0 4px;
+    font-size: 9px; color: var(--muted); font-weight: 600; letter-spacing: 0.03em;
+  }
+  .narrative span { flex: 1; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+<div class="row">
+
+  <!-- 1: Extrinsic -->
+  <div class="panel panel-ext">
+    <div class="title"><span class="icon">✅</span> Extrinsic</div>
+    <div class="flow">
+      <div class="emoji">👤 💬 → 🎯</div>
+      <div class="prompt-ex">📝 "Solve in formal English"</div>
+      <div class="card">
+        <div class="mono"><i>h</i>(instr+q) − <i>h</i>(instr)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-circle">→</div>
+
+  <!-- 2: Intrinsic -->
+  <div class="panel panel-int">
+    <div class="title"><span class="icon">⚠️</span> Intrinsic</div>
+    <div class="flow">
+      <div class="emoji">🧠 🔄 → ❓</div>
+      <div class="cot-abstract">
+        <div class="cot-line cot-line-long"></div>
+        <div class="cot-line cot-line-full"></div>
+        <div class="cot-line cot-line-med"></div>
+        <div class="cot-line-highlight cot-line-highlight-long"></div>
+        <div class="cot-line cot-line-full"></div>
+        <div class="cot-line cot-line-short"></div>
+        <div class="cot-line cot-line-med"></div>
+        <div class="cot-line-highlight cot-line-highlight-short"></div>
+        <div class="cot-line cot-line-long"></div>
+      </div>
+      <div class="spontaneous-label">🟡 = reflection ⚡</div>
+    </div>
+  </div>
+
+  <div class="arrow-circle">→</div>
+
+  <!-- 3: Keyword Matching -->
+  <div class="panel panel-seal">
+    <div class="title"><span class="icon">🔍</span> Keyword Matching</div>
+    <div class="flow">
+      <div class="cot-seal">
+        <div>...so x = 5.</div>
+        <div class="newline-row">
+          <span class="newline-tag">\n\n</span>
+          <span class="detect-formula">→ h<sub>here</sub></span>
+        </div>
+        <div><span class="kw">Wait, let me double check</span>...</div>
+        <div class="detect-row">
+          <span class="detect-label">🏷️ "Wait" → Reflection ✓</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="mono">Σh<sub>boundary</sub> − Σh<sub>execution</sub></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow-circle arrow-circle-alert">⚡</div>
+
+  <!-- 4: Our Finding -->
+  <div class="panel panel-obs">
+    <div class="title"><span class="icon">🔬</span> Our Finding</div>
+    <div class="flow">
+      <div style="font-size:12px;font-weight:700;color:var(--red-text);text-align:center;">🔄 Re-generate ×10 from same prefix</div>
+      <div class="hist-wrap">
+        <div class="hist-bars">
+          <div class="hist-col"><div class="hist-bar bar-red" style="height:46px;"></div><div class="hist-tick">0</div></div>
+          <div class="hist-col"><div class="hist-bar bar-red" style="height:15px;"></div><div class="hist-tick">.1</div></div>
+          <div class="hist-col"><div class="hist-bar bar-red" style="height:9px;"></div><div class="hist-tick">.2</div></div>
+          <div class="hist-col"><span class="bar-label bar-label-red">93%</span><div class="hist-bar bar-red" style="height:5px;"></div><div class="hist-tick">.3</div></div>
+          <div class="hist-col"><div class="hist-bar bar-red" style="height:7px;"></div><div class="hist-tick">.4</div></div>
+          <div class="hist-col"><div class="hist-bar bar-red" style="height:2px;"></div><div class="hist-tick">.5</div></div>
+          <div class="hist-col"><div class="hist-bar bar-red" style="height:2px;"></div><div class="hist-tick">.6</div></div>
+          <div class="hist-col"><div class="hist-bar bar-red" style="height:3px;"></div><div class="hist-tick">.7</div></div>
+          <div class="hist-col"><span class="bar-label bar-label-green">7%</span><div class="hist-bar bar-green" style="height:3px;"></div><div class="hist-tick">.8</div></div>
+          <div class="hist-col"><div class="hist-bar bar-green" style="height:2px;"></div><div class="hist-tick">.9</div></div>
+          <div class="hist-col"><div class="hist-bar bar-green" style="height:3px;"></div><div class="hist-tick">1</div></div>
+        </div>
+        <div class="hist-xlabel">stability score →</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+</div>
+
+</body>
+</html>

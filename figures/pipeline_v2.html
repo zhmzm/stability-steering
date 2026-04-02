@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #fff; padding: 20px; }
+
+  .pipeline { display: flex; align-items: stretch; max-width: 900px; margin: 0 auto; }
+
+  .half-left { flex: 0.45; display: flex; }
+  .half-right { flex: 1.55; display: flex; gap: 8px; }
+
+  .divider {
+    width: 0;
+    border-left: 2.5px dashed #bdbdbd;
+    margin: 0 12px;
+    flex-shrink: 0;
+  }
+
+  .stage {
+    background: #fafbfc;
+    border: 2px solid #e1e4e8;
+    border-radius: 12px;
+    padding: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .stage-header {
+    font-size: 16px;
+    font-weight: 800;
+    color: #24292e;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 2.5px solid;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .stage-seal .stage-header { border-color: #959da5; color: #616161; }
+  .stage-ours .stage-header { border-color: #0366d6; }
+  .stage-probe .stage-header { border-color: #28a745; }
+
+  .arrow-between { display: flex; align-items: center; font-size: 22px; color: #959da5; flex-shrink: 0; }
+
+  .q-block {
+    background: #fff; border: 1.5px solid #d1d5da; border-radius: 7px;
+    padding: 6px; margin-bottom: 4px;
+  }
+  .q-label { font-size: 13px; font-weight: 700; color: #586069; margin-bottom: 2px; }
+  .b-row { display: flex; gap: 2px; flex-wrap: wrap; }
+  .b { font-size: 11px; padding: 1px 4px; border-radius: 3px; font-weight: 600; }
+  .b-r { background: #dcedc8; color: #33691e; border: 1px solid #aed581; }
+  .b-t { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+  .b-e { background: #f5f5f5; color: #616161; border: 1px solid #e0e0e0; }
+
+  .seal-formula {
+    margin-top: 5px; text-align: center; font-size: 13px; color: #424242;
+  }
+  .seal-line {
+    display: flex; align-items: center; justify-content: center;
+    gap: 2px; margin-bottom: 1px;
+  }
+
+  .v-g { background: #e8f5e9; border: 1px solid #81c784; border-radius: 3px; padding: 1px 5px; font-size: 12px; font-weight: 700; color: #2e7d32; }
+  .v-q { background: #fff3e0; border: 1px solid #ffb74d; border-radius: 3px; padding: 1px 5px; font-size: 12px; font-weight: 700; color: #e65100; }
+  .v-s { background: #e8eaf6; border: 1px solid #7986cb; border-radius: 3px; padding: 1px 5px; font-size: 12px; font-weight: 700; color: #283593; }
+
+  .sad-box {
+    background: #ffebee; border: 1.5px solid #ef5350; border-radius: 7px;
+    padding: 5px; text-align: center; margin-top: 5px;
+    font-size: 13px; font-weight: 700; color: #b71c1c;
+  }
+
+  .step-row {
+    display: flex; align-items: center; gap: 3px;
+    font-size: 12px; color: #0d47a1; font-weight: 600;
+    margin-top: 3px; padding: 2px 0;
+  }
+  .svd-row {
+    display: flex; align-items: center; gap: 3px;
+    font-size: 12px; color: #283593; font-weight: 600;
+    background: #e8eaf6; border-radius: 4px; padding: 3px 6px; margin-top: 2px;
+  }
+
+  .probe-row {
+    display: flex; align-items: center; gap: 4px;
+    background: #fff; border: 1.5px solid #d1d5da; border-radius: 6px;
+    padding: 4px 7px; margin-bottom: 4px;
+  }
+  .probe-b { font-size: 12px; padding: 1px 5px; border-radius: 3px; font-weight: 700; flex-shrink: 0; }
+  .dots { display: flex; gap: 2px; flex-shrink: 0; }
+  .d { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid; }
+  .d-y { background: #4caf50; border-color: #388e3c; }
+  .d-n { background: #ef5350; border-color: #c62828; }
+  .sc { font-size: 12px; font-weight: 700; margin-left: auto; padding: 1px 5px; border-radius: 3px; }
+  .sc-s { background: #c8e6c9; color: #1b5e20; }
+  .sc-u { background: #ffcdd2; color: #b71c1c; }
+  .lb { font-size: 12px; font-weight: 700; padding: 1px 5px; border-radius: 3px; color: #fff; }
+  .lb-s { background: #4caf50; }
+  .lb-u { background: #ef5350; }
+
+  .regen-box {
+    background: #f3e5f5; border: 1.5px solid #ba68c8; border-radius: 7px;
+    padding: 5px 7px; margin-bottom: 6px;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .regen-text { font-size: 13px; font-weight: 700; color: #6a1b9a; }
+  .regen-x10 { background: #7b1fa2; color: #fff; font-size: 12px; font-weight: 800; padding: 1px 5px; border-radius: 3px; }
+
+  .stat-box {
+    background: #fff3e0; border: 1.5px solid #ffcc80; border-radius: 6px;
+    padding: 5px 7px; font-size: 13px; color: #e65100;
+    font-weight: 700; text-align: center; margin-top: 5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="pipeline">
+
+  <!-- SEAL Baseline -->
+  <div class="half-left">
+    <div class="stage stage-seal">
+      <div class="stage-header">😞 SEAL Baseline</div>
+      <div class="q-block">
+        <div class="q-label">📝 Q1</div>
+        <div class="b-row"><span class="b b-e">E</span><span class="b b-r">R</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-r">R</span><span class="b b-e">E</span><span class="b b-t">T</span><span class="b b-e">E</span></div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">📝 Q2</div>
+        <div class="b-row"><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-r">R</span><span class="b b-e">E</span><span class="b b-t">T</span><span class="b b-e">E</span><span class="b b-r">R</span><span class="b b-e">E</span><span class="b b-e">E</span></div>
+      </div>
+      <div class="seal-formula">
+        <div class="seal-line">
+          <span style="font-size:20px;font-weight:300;">Σ</span><span style="font-size:20px;font-weight:200;">(</span>
+          <span class="b b-r">R</span><span class="b b-r">R</span><span class="b b-r">R</span><span class="b b-r">R</span><span class="b b-t">T</span><span class="b b-t">T</span>
+          <span style="font-size:20px;font-weight:200;">)</span>
+        </div>
+        <div style="font-size:15px;line-height:1;">−</div>
+        <div class="seal-line">
+          <span style="font-size:20px;font-weight:300;">Σ</span><span style="font-size:20px;font-weight:200;">(</span>
+          <span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-e">E</span>
+          <span style="font-size:20px;font-weight:200;">)</span>
+        </div>
+      </div>
+      <div class="sad-box">❌ Mixes stable + unstable boundaries</div>
+      <div class="sad-box" style="background:#fff8e1;border-color:#ffa726;color:#e65100;">❌ |B| ≠ |E|, question content leaks</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Our Method -->
+  <div class="half-right">
+
+    <!-- Content-Aware -->
+    <div class="stage stage-ours">
+      <div class="stage-header">🔍 Content-Aware Extraction</div>
+      <div class="q-block">
+        <div class="q-label">📝 Q1</div>
+        <div class="b-row"><span class="b b-e">E</span><span class="b b-r">R</span><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-r">R</span><span class="b b-e">E</span><span class="b b-t">T</span><span class="b b-e">E</span></div>
+        <div class="step-row">① <span class="v-g">d<sub>1</sub></span> = h<sub>R+T</sub> − h<sub>E</sub></div>
+        <div class="svd-row">② 🧠 Q1 → <span class="v-q">h<sub>Q</sub></span> → <span class="v-s">SVD</span> → d<sub>1</sub><sup>⊥</sup></div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">📝 Q2</div>
+        <div class="b-row"><span class="b b-e">E</span><span class="b b-e">E</span><span class="b b-r">R</span><span class="b b-e">E</span><span class="b b-t">T</span><span class="b b-e">E</span><span class="b b-r">R</span><span class="b b-e">E</span><span class="b b-e">E</span></div>
+        <div class="step-row">① <span class="v-g">d<sub>2</sub></span> = h<sub>R+T</sub> − h<sub>E</sub></div>
+        <div class="svd-row">② 🧠 Q2 → <span class="v-q">h<sub>Q</sub></span> → <span class="v-s">SVD</span> → d<sub>2</sub><sup>⊥</sup></div>
+      </div>
+      <div style="text-align:center;margin-top:4px;font-size:13px;color:#0366d6;font-weight:700;">
+        d<sub>k</sub><sup>⊥</sup> = behavior only ✨
+      </div>
+    </div>
+
+    <div class="arrow-between">➜</div>
+
+    <!-- Stability Probing -->
+    <div class="stage stage-probe">
+      <div class="stage-header">🔬 Stability Probing</div>
+      <div class="regen-box">
+        <span style="font-size:20px;">🔄</span>
+        <span class="regen-text">Regenerate from prefix</span>
+        <span class="regen-x10">×10</span>
+      </div>
+      <div class="probe-row">
+        <span class="probe-b b-r">R<sub>1</sub></span>
+        <div class="dots"><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-n"></div></div>
+        <span class="sc sc-s">9/10</span><span class="lb lb-s">✅</span>
+      </div>
+      <div class="probe-row">
+        <span class="probe-b b-r">R<sub>2</sub></span>
+        <div class="dots"><div class="d d-n"></div><div class="d d-y"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-y"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div></div>
+        <span class="sc sc-u">2/10</span><span class="lb lb-u">❌</span>
+      </div>
+      <div class="probe-row">
+        <span class="probe-b b-t">T<sub>1</sub></span>
+        <div class="dots"><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div><div class="d d-n"></div></div>
+        <span class="sc sc-u">0/10</span><span class="lb lb-u">❌</span>
+      </div>
+      <div class="probe-row">
+        <span class="probe-b b-r">R<sub>3</sub></span>
+        <div class="dots"><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-y"></div><div class="d d-n"></div><div class="d d-n"></div></div>
+        <span class="sc sc-s">8/10</span><span class="lb lb-s">✅</span>
+      </div>
+      <div class="stat-box">⚠️ Only stable d<sub>k</sub><sup>⊥</sup> kept</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
